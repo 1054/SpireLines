@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+# Aim:
+#    This code will print MJy/sr to Jy/beam conversion factor
+# 
+# Usage:
+#    source '/Users/dzliu/Cloud/Github/SpireLines/Softwares/bin_setup.bash'
+#    FTS_tool_print_MJy_sr_to_Jy_beam_conversion_factor "SPIRE_250um.fits"
+# 
+
+
+Usage() {
+    echo "Usage: "
+    echo "    FTS_tool_print_MJy_sr_to_Jy_beam_conversion_factor \"SPIRE_250um.fits\" [flux_MJy_sr]"
+    echo ""
+}
+
+
+if [[ $(type ${BASH_SOURCE[0]} 2>/dev/null | wc -l) -eq 0 ]]; then
+    source $(dirname ${BASH_SOURCE[0]})/bin_setup.bash
+fi
+
+if [[ $# -eq 0 ]]; then
+    Usage
+    exit
+fi
+
+pix_scale=$(pixscale "$1")
+
+hdr_detector=$(gethead "$1" DETECTOR)
+if [[ x"$hdr_detector" == x ]]; then
+    echo "Sorry! Failed to find keyword \"DETECTOR\" in the header of \"$1\"!"
+    exit
+fi
+
+beam_size=""
+if [[ "$hdr_detector" == "PSW"* ]]; then
+    beam_size="17.6"
+elif [[ "$hdr_detector" == "PMW"* ]]; then
+    beam_size="23.9"
+elif [[ "$hdr_detector" == "PLW"* ]]; then
+    beam_size="35.2"
+fi
+if [[ x"$beam_size" == x ]]; then
+    echo "Sorry! Failed to match the DETECTOR keyvalue \"$hdr_detector\" to either \"PSW\", \"PMW\" or \"PLW\"!"
+    exit
+fi
+
+if [[ $# -ge 2 ]]; then
+    flux_input="$2"
+else
+    flux_input="1.0"
+fi
+
+awk "BEGIN {printf \"%0.20f\n\", $flux_input * ( 2.350443e-5 * (3.1415926/(4*log(2))*($beam_size)*($beam_size)) );}"
+
+
+
+

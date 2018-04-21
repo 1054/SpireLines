@@ -1,0 +1,47 @@
+#!/bin/bash
+# 
+# common caller for dzliu tools:
+#=  CrabFitsHeader
+#=  CrabFitsImageArithmetic
+#=  CrabFitsImageCrop
+#=  CrabFitsImageCopy
+#=  CrabPhotAperPhot
+#=  CrabPhotRingPhot
+#=  CrabPhotImageStatistics
+#=  CrabPhotMonteCarlo
+#=  CrabTableReadColumn
+#=  CrabTableReadInfo
+#=  degree2radec
+#=  radec2degree
+#=  lumdist
+#=  ttyecho
+#=  xpaaccess
+#=  xpaget
+#=  xpainfo
+#=  xpamb
+#=  xpans
+#=  xpaset
+# 
+# for ff in $(cat CrabFitsHeader | grep "^#= " | tr -s ' ' | cut -d ' ' -f 2); do cp CrabFitsHeader $ff; done
+#   
+# 
+# Linux
+if [[ $(uname -s) == Linux ]]; then
+    if [[ $(bc <<< "$(ldd --version | head -n 1 | tr -s ' ' | cut -d ' ' -f 4 | cut -d '.' -f 2)<14") -eq 1 ]]; then
+        # the supercomputer planer has an old GLIBC version
+        $(dirname $0)/ds9_linux_Glibc_2.12/$(basename $0)_linux_x86_64 $*
+    else
+        $(dirname $0)/ds9_linux_Glibc_2.14/$(basename $0)_linux_x86_64 $*
+    fi
+fi
+# Darwin
+if [[ $(uname -s) == Darwin ]]; then
+    $(dirname $0)/ds9_mac/$(basename $0)_mac $*
+fi
+# Cygwin
+if [[ $(uname -s) == *CYGWIN* ]]; then
+    $(dirname $0)/ds9_cygwin/$(basename $0)_cygwin_x86.exe $*
+fi
+
+
+

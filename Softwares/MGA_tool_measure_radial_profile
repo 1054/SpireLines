@@ -1,0 +1,112 @@
+#!/bin/bash
+# 
+
+source $(dirname ${BASH_SOURCE[0]})/bin_setup.bash
+
+
+input_fits_files=()
+input_center_radec=()
+input_radius_start="5.0" # arcsec
+input_radius_step="10.0" # arcsec
+input_radius_end="180.0" # arcsec
+
+i=1
+
+while [[ $i -le $# ]]; do
+    str_arg=$(echo "${!i}" | sed -e 's/^--/-/g' | tr '[:upper:]' '[:lower:]')
+    if [[ "$str_arg" == "-center" ]] || [[ "$str_arg" == "-center-radec" ]]; then
+        if [[ $(bc <<< "$i+2") -le $# ]]; then
+            i=$(bc <<< "$i+1")
+            input_center_radec+=("${!i}")
+            i=$(bc <<< "$i+1")
+            input_center_radec+=("${!i}")
+        fi
+    elif [[ "$str_arg" == "-start" ]] || [[ "$str_arg" == "-radius-start" ]]; then
+        if [[ $(bc <<< "$i+1") -le $# ]]; then
+            i=$(bc <<< "$i+1")
+            input_radius_start="${!i}"
+        fi
+    elif [[ "$str_arg" == "-step" ]] || [[ "$str_arg" == "-radius-step" ]]; then
+        if [[ $(bc <<< "$i+1") -le $# ]]; then
+            i=$(bc <<< "$i+1")
+            input_radius_step="${!i}"
+        fi
+    elif [[ "$str_arg" == "-end" ]] || [[ "$str_arg" == "-radius-end" ]]; then
+        if [[ $(bc <<< "$i+1") -le $# ]]; then
+            i=$(bc <<< "$i+1")
+            input_radius_end="${!i}"
+        fi
+    else
+        input_fits_files+=("${!i}")
+    fi
+    i=$(bc <<< "$i+1")
+done
+
+# Check input fits files
+if [[ ${#input_fits_files[@]} -eq 0 ]]; then
+    echo "Usage: "
+    echo "    MGA_tool_measure_radial_profile aaa.fits -center 159.20 20.32"
+    echo ""
+    exit
+fi
+
+# Print input 
+echo "# MGA_tool_measure_radial_profile"
+echo "# input_fits_files: ${input_fits_files[@]}"
+echo "# input_center_radec: ${input_center_radec[@]}"
+
+# Loop each input fits file
+for (( i = 0; i < ${#input_fits_files[@]}; i++ )); do
+    if [[ ! -f "${input_fits_files[i]}" ]]; then
+        echo "Error! \"${input_fits_files[i]}\" was not found!"; exit 1
+    fi
+    fits_file="${input_fits_files[i]}"
+    pix_scale=$(pixscale "$fits_file"); if [[ x"$pix_scale" == x ]]; then echo "Error! Failed to get pix_scale from \"$fits_file\"!"; exit 1; fi
+    printf "%0.15f\n" "$pix_scale" > MGA_file_pixscale.txt
+    
+    # image center
+    center_ra="${input_center_radec[0]}"
+    center_dec="${input_center_radec[1]}"
+    if [[ ${#input_center_radec[@]} -lt 2 ]]; then
+        pix_naxis1=$(gethead "$fits_file" NAXIS1)
+        pix_naxis2=$(gethead "$fits_file" NAXIS2)
+        pix_center_x=$(awk "BEGIN {print ($pix_naxis1+1) / 2.0;}")
+        pix_center_y=$(awk "BEGIN {print ($pix_naxis2+1) / 2.0;}")
+        array_xy2sky=($(xy2sky -d -n 10 "$fits_file" ${pix_center_x} ${pix_center_y}))
+        center_ra="${array_xy2sky[0]}"
+        center_dec="${array_xy2sky[1]}"
+    fi
+    
+    # create a series of radii
+    radius_arcsec="$input_radius_start"
+    echo "# apertures: "
+    printf "# %13s %15s %15s %15s\n" "PosX" "PosY" "RadiusPix" "RadiusArcsec"
+    printf "# %13s %15s %15s\n" "PosX" "PosY" "RadiusPix" > MGA_file_apertures.txt
+    printf "# ds9 region file\n" > MGA_file_apertures.ds9.reg
+    printf "fk5\n" >> MGA_file_apertures.ds9.reg
+    while [[ $(awk "BEGIN {if ($radius_arcsec <= $input_radius_end) print 1; else print 0;}") -eq 1 ]]; do
+        array_sky2xy=($(sky2xy -n 10 "$fits_file" ${center_ra} ${center_dec}))
+        pos_x=${array_sky2xy[4]}
+        pos_y=${array_sky2xy[5]}
+        radius_pix=$(awk "BEGIN {print ($radius_arcsec / $pix_scale);}")
+        printf "%15.4f %15.4f %15.4f %15.4f\n" "$pos_x" "$pos_y" "$radius_pix" "$radius_arcsec"
+        printf "%15.4f %15.4f %15.4f\n" "$pos_x" "$pos_y" "$radius_pix" >> MGA_file_apertures.txt
+        printf "circle(%0.4f,%0.4f,%0.4f\")\n" "$center_ra" "$center_dec" "$radius_arcsec" >> MGA_file_apertures.ds9.reg
+        radius_arcsec=$(awk "BEGIN {print ($radius_arcsec + $input_radius_step);}")
+    done
+    
+    #echo "# apertures: "
+    #cat MGA_file_apertures.txt
+    
+    echo ""
+    CrabPhotAperPhot "$fits_file" none MGA_file_apertures.txt > MGA_file_aperphots.txt
+    
+    echo ""
+    break
+    
+done
+
+
+
+
+

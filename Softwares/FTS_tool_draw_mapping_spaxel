@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# Aim:
+#    This code will create a series of circles on the sky representing FTS spaxel pattern
+#    according to the user input RA Dec and PA. 
+# 
+# Usage:
+#    source '/Users/dzliu/Cloud/Github/SpireLines/Softwares/bin_setup.bash'
+#    FTS_tool_draw_mapping_spaxel aaa.fits
+# 
+
+
+
+if [[ ! -d "phot" ]]; then
+    echo "Error! \"phot\" directory was not found!"
+    exit
+fi
+
+fits_file=$(find phot -name "*.fits" | head -n 1)
+echo "fits_file = $fits_file"
+
+
+
+if [[ ! -d "sfit" ]]; then
+    echo "Error! \"sfit\" directory was not found!"
+    exit
+fi
+
+if [[ ! -d "sfit/SPIRE_FTS_SOF2" ]]; then
+    echo "Error! \"sfit/SPIRE_FTS_SOF2\" directory was not found!"
+    exit
+fi
+
+sfit_files=($(find sfit/SPIRE_FTS_SOF2 -wholename "*/SLW_*/M82_FromHIPE_SLW.CSV"))
+echo "sfit_files = ${#sfit_files[@]}"
+
+
+
+ds9_i=1
+while [[ $(xpaget FTS_$ds9_i frame 2>/dev/null | wc -l) -ge 1 ]]; do
+    ds9_i=$(bc <<< "$ds9_i + 1")
+done
+ds9_title="FTS_$ds9_i"
+if [[ ${#sfit_files[@]} -gt 0 ]]; then
+    echo -n "ds9 -title \"$ds9_title\" -multiframe \"$fits_file\""
+    ds9 -title "$ds9_title" -multiframe "$fits_file" -scale log -cmap heat &
+fi
+while [[ $(xpaget FTS_$ds9_i frame 2>/dev/null | wc -l) -eq 0 ]]; do
+    echo -n "."
+    sleep 1.2
+done
+echo ""
+
+
+for (( i = 0; i < ${#sfit_files[@]}; i++ )); do
+    spaxel_RA=$(cat "${sfit_files[i]}" | grep "# RA *= " | head -n 1 | perl -p -e 's/.* = ([0-9.+-eE]+)\S.*/\1/g')
+    spaxel_Dec=$(cat "${sfit_files[i]}" | grep "# Dec *= " | head -n 1 | perl -p -e 's/.* = ([0-9.+-eE]+)\S.*/\1/g')
+    line_CO54=($(cat "${sfit_files[i]}" | grep -v "^#" | grep "CO(5-4)" | sed -e 's/^ *//g' | tr -s ' '))
+    flux_CO54=${line_CO54[12]}
+    err_CO54=${line_CO54[13]}
+    has_CO54=$(awk "BEGIN {if ($flux_CO54 > 3.0*$err_CO54) print 1; else print 0;}")
+    beamsize_CO54=35.0
+    radius_CO54=$(awk "BEGIN {print ($beamsize_CO54/4.0);}")
+    #echo "spaxel_RA = $spaxel_RA"
+    #echo "spaxel_Dec = $spaxel_Dec"
+    if [[ $has_CO54 -ge 1 ]]; then
+        echo "fk5; circle $spaxel_RA $spaxel_Dec $radius_CO54\"" | xpaset "$ds9_title" regions 
+    else
+        echo "fk5; circle $spaxel_RA $spaxel_Dec $radius_CO54\" # dash=1 color=\"#cccccc\"" | xpaset "$ds9_title" regions 
+    fi
+    #break
+done
+
+
+
+
+

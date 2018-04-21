@@ -1,0 +1,158 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{courier}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{epsfig}
+\usepackage{listings}
+% -- subtitle
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+    % http://tex.stackexchange.com/questions/50182/subtitle-with-the-maketitle-page
+}
+% -- fonts
+\usepackage{fontspec}
+\setmainfont{RomanSerif}
+\setsansfont{Overlock}
+\setmonofont{Inconsolata}
+% -- xmark
+\newcommand{\xmark}{\textcolor{green!50!black}{x}}
+% -- table font size -- http://tex.stackexchange.com/questions/27097/changing-the-font-size-in-a-table
+\usepackage{floatrow}
+\DeclareFloatFont{large}{\large} % "scriptsize" is defined by floatrow, "tiny" not
+\floatsetup[table]{font=large}
+% -- author, title
+\author{}
+\title{Example Manual}
+\subtitle{(Subtitle)}
+\begin{document}
+\maketitle
+\tableofcontents
+\clearpage
+\setlength{\baselineskip}{16pt}
+\setlength{\parskip}{5pt}
+% -- code style text box
+\lstset{
+	numbers=left,
+	stepnumber=1,
+	numbersep=10pt,
+	numberstyle=\footnotesize,
+	basicstyle=\fontsize{8}{12}\ttfamily,
+	keywordstyle=\color{blue!50!black},
+	stringstyle=\color{red!50!black},
+	commentstyle=\color{red!50!green!50!blue!50},
+	frame=shadowbox,
+	rulesepcolor=\color{red!20!green!20!blue!20},
+	escapeinside=``,
+	xleftmargin=2em,
+	xrightmargin=0em,
+	aboveskip=1em,
+	tabsize=4,
+	showspaces=false,
+	showstringspaces=false
+}
+
+%*************************************************************************************
+\section{Abstract}
+
+This is a manual for ...
+
+\vspace{5cm}
+Hints: black text are our method and procedures, \textcolor{blue}{blue text are notes}, and \textcolor{red}{red text are unsolved issues.}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+\section{Flow Chart}
+\label{FlowChart}
+
+%\begin{figure}[H]
+%	\caption{{Flow Chart of Processes.}\newline Descriptions.}
+%	\centering
+%	\includegraphics[width=1.05\textwidth]{FlowChartDiagram}
+%\end{figure}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+\section{Processing Status}
+\label{ProcessingStatus}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+\section{Step 1}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+\section{Step 2}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+\section{Step 3}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+\appendix
+
+%*************************************************************************************
+\section{Softwares}
+\label{Appendix_Software_Dependencies}
+
+\begin{lstlisting}[language=bash]
+IDL
+C++
+\end{lstlisting}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+\section{Appendix 2}
+
+%*************************************************************************************
+
+\clearpage
+
+%*************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

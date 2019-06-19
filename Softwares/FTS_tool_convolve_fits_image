@@ -68,7 +68,8 @@ fi
 # 
 # Run IDL code
 # 
-IDL_PATH="$IDL_PATH:+$(dirname ${BASH_SOURCE[0]})"
+IDL_PATH="$IDL_PATH:$(dirname ${BASH_SOURCE[0]}):+$(dirname ${BASH_SOURCE[0]})/IDLAstro/pro"
+echo "IDL_PATH=$IDL_PATH"
 for (( i = 0; i < ${#input_fits_files[@]}; i++ )); do
 if [[ $i -lt ${#output_fits_files[@]} ]]; then
     output_file="${output_fits_files[i]}"
@@ -76,8 +77,8 @@ else
     output_file=""
 fi
 idl -quiet << EOF
-    .r FTS_tool_convolve_fits_image
-    FTS_tool_convolve_fits_image, "${input_fits_files[i]}", from_beam=$input_from_beam, to_beam=$input_to_beam, output_file="$output_file"
+    .r FTS_tool_convolve_fits_image_idl
+    FTS_tool_convolve_fits_image_idl, '${input_fits_files[i]}', from_beam=$input_from_beam, to_beam=$input_to_beam, output_file='$output_file'
 EOF
 done
 

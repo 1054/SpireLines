@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Aim:
-#    This code will print MJy/sr to Jy/pixel conversion factor
+#    This code will regrid a fits image using IDL
 # 
 # Usage:
 #    source '/Users/dzliu/Cloud/Github/SpireLines/Softwares/bin_setup.bash'
@@ -11,7 +11,7 @@
 
 Usage() {
     echo "Usage: "
-    echo "    FTS_tool_regrid_fits_image \"SPIRE_250um.fits\" -x 105 -y 105"
+    echo "    FTS_tool_regrid_fits_image \"SPIRE_250um.fits\" -x 105 -y 105 [-out output_file.fits]"
     echo ""
 }
 
@@ -29,6 +29,7 @@ fi
 input_fits_files=()
 input_to_dimension_x="0"
 input_to_dimension_y="0"
+output_fits_file=()
 
 i=1
 
@@ -43,6 +44,11 @@ while [[ $i -le $# ]]; do
         if [[ $(bc <<< "$i+1") -le $# ]]; then
             i=$(bc <<< "$i+1")
             input_to_dimension_y="${!i}"
+        fi
+    elif [[ "$str_arg" == "-out" ]]; then
+        if [[ $(bc <<< "$i+1") -le $# ]]; then
+            i=$(bc <<< "$i+1")
+            output_fits_file+=("${!i}")
         fi
     else
         input_fits_files+=("${!i}")
@@ -61,12 +67,20 @@ fi
 # 
 # Run IDL code
 # 
-IDL_PATH="$IDL_PATH:+$(dirname ${BASH_SOURCE[0]})"
+IDL_PATH="$IDL_PATH:$(dirname ${BASH_SOURCE[0]}):+$(dirname ${BASH_SOURCE[0]})/IDLAstro/pro"
+echo "IDL_PATH=$IDL_PATH"
 for (( i = 0; i < ${#input_fits_files[@]}; i++ )); do
+if [[ ${#output_fits_file[@]} -gt $i ]]; then
 idl -quiet << EOF
-    .r FTS_tool_regrid_fits_image
-    FTS_tool_regrid_fits_image, "${input_fits_files[i]}", x=$input_to_dimension_x, y=$input_to_dimension_y
+.r FTS_tool_regrid_fits_image_idl
+FTS_tool_regrid_fits_image_idl, '${input_fits_files[i]}', x=$input_to_dimension_x, y=$input_to_dimension_y, output_file='${output_fits_file[i]}'
 EOF
+else
+idl -quiet << EOF
+.r FTS_tool_regrid_fits_image_idl
+FTS_tool_regrid_fits_image_idl, '${input_fits_files[i]}', x=$input_to_dimension_x, y=$input_to_dimension_y
+EOF
+fi
 done
 
 

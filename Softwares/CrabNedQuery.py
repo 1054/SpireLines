@@ -5,7 +5,12 @@
 # to check if the input 
 # galaxies are AGN or not
 # 
+# last update:
+#     20181007 for Python3, for new version of astroquery
 # 
+
+from __future__ import print_function
+from astroquery.ned import Ned
 
 def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
     # 
@@ -24,7 +29,7 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
         QueryObject = Ned.query_object(InputItem)
         # print(QueryObject) # an astropy.table.Table
         QueryPhotometry = Ned.get_table(InputItem, table='photometry') # Must be one of [‘photometry’|’positions’|’diameters’|’redshifts’|’references’|’object_notes’]
-        # print QueryPhotometry[['Observed Passband','Units']] # ('No.', 'Observed Passband', 'Photometry Measurement', 'Uncertainty', 'Units', 'Frequency', 'NED Photometry Measurement', 'NED Uncertainty', 'NED Units', 'Refcode', 'Significance', 'Published frequency', 'Frequency Mode', 'Coordinates Targeted', 'Spatial Mode', 'Qualifiers', 'Comments')
+        # print(QueryPhotometry[['Observed Passband','Units']] # ('No.', 'Observed Passband', 'Photometry Measurement', 'Uncertainty', 'Units', 'Frequency', 'NED Photometry Measurement', 'NED Uncertainty', 'NED Units', 'Refcode', 'Significance', 'Published frequency', 'Frequency Mode', 'Coordinates Targeted', 'Spatial Mode', 'Qualifiers', 'Comments'))
         
         # 
         # extract OIII5007 Hbeta4861 Halpha6563 NII6583
@@ -37,25 +42,25 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
         for i in range(len(QueryPhotometry)):
             if LineFlux_OII3727 <= 0 and QueryPhotometry['Observed Passband'][i].startswith("[O II] 3727"):
                 LineFlux_OII3727 = QueryPhotometry['Photometry Measurement'][i]
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
             if LineFlux_OIII4945 <= 0 and QueryPhotometry['Observed Passband'][i].startswith("[O III] 4945"):
                 LineFlux_OIII4945 = QueryPhotometry['Photometry Measurement'][i]
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
             if LineFlux_OIII5007 <= 0 and QueryPhotometry['Observed Passband'][i].startswith("[O III] 5007"):
                 LineFlux_OIII5007 = QueryPhotometry['Photometry Measurement'][i]
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
             if LineFlux_Hbeta4861 <= 0 and QueryPhotometry['Observed Passband'][i].startswith("H{beta}"):
                 LineFlux_Hbeta4861 = QueryPhotometry['Photometry Measurement'][i]
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
             if LineFlux_Halpha6563 <= 0 and QueryPhotometry['Observed Passband'][i].startswith("H{alpha}"):
                 LineFlux_Halpha6563 = QueryPhotometry['Photometry Measurement'][i]
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
             if LineFlux_NII6583 <= 0 and QueryPhotometry['Observed Passband'][i].startswith("[N II] 6584"):
                 LineFlux_NII6583 = QueryPhotometry['Photometry Measurement'][i]
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
             if LineFlux_NII6583 <= 0 and QueryPhotometry['Observed Passband'][i].startswith("[N II] 6583"):
                 LineFlux_NII6583 = QueryPhotometry['Photometry Measurement'][i]
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
         
         # 
         # <TODO> fix NED bugs
@@ -68,11 +73,11 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
         LineRatio_OIIIHbeta = 0.0
         if LineFlux_Hbeta4861 > 0.0 and LineFlux_OIII5007 > 0.0:
             LineRatio_OIIIHbeta = (LineFlux_OIII5007 / LineFlux_Hbeta4861)
-            print "LineRatio_OIII_Hbeta = %0.3f"%(LineRatio_OIIIHbeta)
+            print("LineRatio_OIII_Hbeta = %0.3f"%(LineRatio_OIIIHbeta))
             LineRatio_OIIIHbeta_log10 = math.log10(LineFlux_OIII5007 / LineFlux_Hbeta4861)
-            print "LineRatio_OIII_Hbeta_log10 = %0.3f dex"%(LineRatio_OIIIHbeta_log10)
+            print("LineRatio_OIII_Hbeta_log10 = %0.3f dex"%(LineRatio_OIIIHbeta_log10))
         else:
-            print "Warning! No Hbeta4861 found!"
+            print("Warning! No Hbeta4861 found!")
             #return OutputTypeAGN
         
         # 
@@ -80,25 +85,25 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
         LineRatio_NIIHalpha = 0.0
         if LineFlux_Halpha6563 > 0.0 and LineFlux_NII6583 > 0.0:
             LineRatio_NIIHalpha = (LineFlux_NII6583 / LineFlux_Halpha6563)
-            print "LineRatio_NII_Halpha = %0.3f"%(LineRatio_NIIHalpha)
+            print("LineRatio_NII_Halpha = %0.3f"%(LineRatio_NIIHalpha))
             LineRatio_NIIHalpha_log10 = math.log10(LineFlux_NII6583 / LineFlux_Halpha6563)
-            print "LineRatio_NII_Halpha_log10 = %0.3f dex"%(LineRatio_NIIHalpha_log10)
+            print("LineRatio_NII_Halpha_log10 = %0.3f dex"%(LineRatio_NIIHalpha_log10))
         else:
-            print "Warning! No Halpha6563 found!"
+            print("Warning! No Halpha6563 found!")
             #return OutputTypeAGN
         
         # 
         # check Seyfert or LINER -- Kauffmann et al. 2013 MNRAS 346 105 Fig.1 Caption -- http://adsabs.harvard.edu/abs/2003MNRAS.346.1055K
         if LineRatio_OIIIHbeta >= (3.0) and LineRatio_NIIHalpha >= (0.6):
-            print "%s is %s"%(InputItem,"Seyfert")
+            print("%s is %s"%(InputItem,"Seyfert"))
             OutputTypeAGN[oio] = "Seyfert"
         if LineRatio_OIIIHbeta < (3.0) and LineRatio_NIIHalpha >= (0.6):
-            print "%s is %s"%(InputItem,"LINER")
+            print("%s is %s"%(InputItem,"LINER"))
             OutputTypeAGN[oio] = "LINER"
         
         # 
         # write to file
-        print OutputTypeAGN
+        print(OutputTypeAGN)
         if LineFlux_Hbeta4861 > 0.0 and LineFlux_Halpha6563 > 0.0 and LineFlux_NII6583 > 0.0 and LineFlux_OIII5007 > 0.0:
             if type(OutputInfoAGN) is str:
                 OutputFileUnit = open(OutputInfoAGN,'w')
@@ -122,8 +127,8 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
                     OutputFileUnit.write("Metallicity = %f\n"%(Metallicity))
                     OutputFileUnit.write("Metallicity_method = \"12+log(O/H) = Pettini & Pagel (2004) - PP04 O3N2\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf\n")
                     OutputFileUnit.close()
-                print "Metallicity = %f"%(Metallicity)
-                print "Metallicity_method = \"12+log(O/H) = Pettini & Pagel (2004) - PP04 O3N2\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf"
+                print("Metallicity = %f"%(Metallicity))
+                print("Metallicity_method = \"12+log(O/H) = Pettini & Pagel (2004) - PP04 O3N2\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf")
         
         if Metallicity == 0.0 and LineRatio_NIIHalpha > 0.0:
             Metallicity_lgN2 = math.log10(LineRatio_NIIHalpha)
@@ -134,8 +139,8 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
                     OutputFileUnit.write("Metallicity = %f\n"%(Metallicity))
                     OutputFileUnit.write("Metallicity_method = \"12+log(O/H) = Pettini & Pagel (2004) - PP04 N2\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf\n")
                     OutputFileUnit.close()
-                print "Metallicity = %f"%(Metallicity)
-                print "Metallicity_method = \"12+log(O/H) = Pettini & Pagel (2004) - PP04 N2\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf"
+                print("Metallicity = %f"%(Metallicity))
+                print("Metallicity_method = \"12+log(O/H) = Pettini & Pagel (2004) - PP04 N2\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf")
         
         if Metallicity == 0.0 and LineFlux_OII3727 > 0.0 and LineFlux_OIII4945 > 0.0 and LineFlux_OIII5007 > 0.0 and LineFlux_Hbeta4861 > 0.0:
             Metallicity_lgR23 = math.log10((LineFlux_OII3727+LineFlux_OIII4945+LineFlux_OIII5007)/LineFlux_Hbeta4861)
@@ -148,8 +153,8 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
                 OutputFileUnit.write("Metallicity = %f\n"%(Metallicity))
                 OutputFileUnit.write("Metallicity_method = \"12+log(O/H) = McGaugh (1991) - M91\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf\n")
                 OutputFileUnit.close()
-            print "Metallicity = %f"%(Metallicity)
-            print "Metallicity_method = \"12+log(O/H) = McGaugh (1991) - M91\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf"
+            print("Metallicity = %f"%(Metallicity))
+            print("Metallicity_method = \"12+log(O/H) = McGaugh (1991) - M91\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf")
         
         if Metallicity == 0.0 and LineRatio_NIIHalpha > 0.0:
             Metallicity_lgN2 = math.log10(LineRatio_NIIHalpha)
@@ -160,9 +165,9 @@ def getInfoAGN(InputList, OutputInfoAGN=[], OutputInfoMetallicity=[]):
                 OutputFileUnit.write("Metallicity_error = %f\n"%(Metallicity*0.2))
                 OutputFileUnit.write("Metallicity_method = \"12+log(O/H) = Denicolo, Terlevich & Terlevich (2002) - D02\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf\n")
                 OutputFileUnit.close()
-            print "Metallicity = %f"%(Metallicity)
-            print "Metallicity_error = %f"%(Metallicity*0.2) # 0.2 dex large error
-            print "Metallicity_method = \"12+log(O/H) = Denicolo, Terlevich & Terlevich (2002) - D02\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf"
+            print("Metallicity = %f"%(Metallicity))
+            print("Metallicity_error = %f"%(Metallicity*0.2)) # 0.2 dex large error
+            print("Metallicity_method = \"12+log(O/H) = Denicolo, Terlevich & Terlevich (2002) - D02\" # http://www.ifa.hawaii.edu/~kewley/Metallicity/ms.pdf")
         
     # 
     # return
@@ -185,8 +190,18 @@ def getInfoOptical(InputList):
         QueryObject = Ned.query_object(InputItem)
         # print(QueryObject) # an astropy.table.Table
         QueryPhotometry = Ned.get_table(InputItem, table='photometry') # Must be one of [‘photometry’|’positions’|’diameters’|’redshifts’|’references’|’object_notes’]
-        # print QueryPhotometry[['Observed Passband','Units']] # ('No.', 'Observed Passband', 'Photometry Measurement', 'Uncertainty', 'Units', 'Frequency', 'NED Photometry Measurement', 'NED Uncertainty', 'NED Units', 'Refcode', 'Significance', 'Published frequency', 'Frequency Mode', 'Coordinates Targeted', 'Spatial Mode', 'Qualifiers', 'Comments')
-        
+        # print(QueryPhotometry[['Observed Passband','Units']] # ('No.', 'Observed Passband', 'Photometry Measurement', 'Uncertainty', 'Units', 'Frequency', 'NED Photometry Measurement', 'NED Uncertainty', 'NED Units', 'Refcode', 'Significance', 'Published frequency', 'Frequency Mode', 'Coordinates Targeted', 'Spatial Mode', 'Qualifiers', 'Comments'))
+        # 
+        # deal with Python 3 str bytearray problem
+        if sys.version_info.major >= 3:
+            QueryPhotometry['Frequency Mode'] = [t.decode('utf-8') for t in QueryPhotometry['Frequency Mode']]
+            QueryPhotometry['NED Uncertainty'] = [t.decode('utf-8') for t in QueryPhotometry['NED Uncertainty']]
+            QueryPhotometry['Observed Passband'] = [t.decode('utf-8') for t in QueryPhotometry['Observed Passband']]
+            QueryPhotometry['Refcode'] = [t.decode('utf-8') for t in QueryPhotometry['Refcode']]
+        # 
+        # deal with new NED table column names
+        if 'Flux Density' in QueryPhotometry.colnames and not ('NED Photometry Measurement' in QueryPhotometry.colnames):
+            QueryPhotometry['NED Photometry Measurement'] = QueryPhotometry['Flux Density']
         # 
         # extract Optical bands
         iOptical = []
@@ -212,7 +227,7 @@ def getInfoOptical(InputList):
                    QueryPhotometry['Observed Passband'][i].startswith("Ks ") or \
                    QueryPhotometry['Observed Passband'][i].startswith("Ks_"):
                     iOptical.extend([i])
-                    print "Optical Flux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                    print("Optical Flux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
         
         # 
         # get Optical fluxes
@@ -225,13 +240,13 @@ def getInfoOptical(InputList):
         # 
         # print
         for i in range(len(iOptical)):
-            fOptical_FluxError[i] = fOptical_FluxError[i].replace('+/-','').replace('...','0.0')
+            fOptical_FluxError[i] = fOptical_FluxError[i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-')
             if len(fOptical_FluxError[i])==0: fOptical_FluxError[i]=0.0
             if fOptical_FluxError[i]=='...': fOptical_FluxError[i]=0.0 #<20180201>#
             fOptical_FluxError[i] = float(fOptical_FluxError[i])*1e3 # mJy
             fOptical_FluxValue[i] = float(fOptical_FluxValue[i])*1e3 # mJy
             fOptical_Wavelengthi = 2.99792458e5/(float(fOptical_Frequency[i])/1e9) # um
-            print fOptical_Wavelengthi,fOptical_FluxValue[i],fOptical_FluxError[i],fOptical_Passband[i],fOptical_Reference[i]
+            print(fOptical_Wavelengthi,fOptical_FluxValue[i],fOptical_FluxError[i],fOptical_Passband[i],fOptical_Reference[i])
             TemporaryOptical = numpy.array([(fOptical_Wavelengthi,fOptical_FluxValue[i],fOptical_FluxError[i],fOptical_Passband[i],fOptical_Reference[i])], dtype=OutputInfoOptical.dtype)
             OutputInfoOptical = rec.stack_arrays( (OutputInfoOptical, TemporaryOptical), usemask=False, asrecarray=True, autoconvert=True )
         
@@ -256,8 +271,18 @@ def getInfoInfrared(InputList):
         QueryObject = Ned.query_object(InputItem)
         # print(QueryObject) # an astropy.table.Table
         QueryPhotometry = Ned.get_table(InputItem, table='photometry') # Must be one of [‘photometry’|’positions’|’diameters’|’redshifts’|’references’|’object_notes’]
-        # print QueryPhotometry[['Observed Passband','Units']] # ('No.', 'Observed Passband', 'Photometry Measurement', 'Uncertainty', 'Units', 'Frequency', 'NED Photometry Measurement', 'NED Uncertainty', 'NED Units', 'Refcode', 'Significance', 'Published frequency', 'Frequency Mode', 'Coordinates Targeted', 'Spatial Mode', 'Qualifiers', 'Comments')
-        
+        # print(QueryPhotometry[['Observed Passband','Units']] # ('No.', 'Observed Passband', 'Photometry Measurement', 'Uncertainty', 'Units', 'Frequency', 'NED Photometry Measurement', 'NED Uncertainty', 'NED Units', 'Refcode', 'Significance', 'Published frequency', 'Frequency Mode', 'Coordinates Targeted', 'Spatial Mode', 'Qualifiers', 'Comments'))
+        # 
+        # deal with Python 3 str bytearray problem
+        if sys.version_info.major >= 3:
+            QueryPhotometry['Frequency Mode'] = [t.decode('utf-8') for t in QueryPhotometry['Frequency Mode']]
+            QueryPhotometry['NED Uncertainty'] = [t.decode('utf-8') for t in QueryPhotometry['NED Uncertainty']]
+            QueryPhotometry['Observed Passband'] = [t.decode('utf-8') for t in QueryPhotometry['Observed Passband']]
+            QueryPhotometry['Refcode'] = [t.decode('utf-8') for t in QueryPhotometry['Refcode']]
+        # 
+        # deal with new NED table column names
+        if 'Flux Density' in QueryPhotometry.colnames and not ('NED Photometry Measurement' in QueryPhotometry.colnames):
+            QueryPhotometry['NED Photometry Measurement'] = QueryPhotometry['Flux Density']
         # 
         # extract Infrared bands
         iInfrared = []
@@ -279,7 +304,7 @@ def getInfoInfrared(InputList):
                    QueryPhotometry['Observed Passband'][i].startswith("850 microns (SCUBA)") or \
                    QueryPhotometry['Observed Passband'][i].startswith("Herschel"):
                     iInfrared.extend([i])
-                    print "Infrared Flux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i]
+                    print("Infrared Flux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Units'][i])
         
         # 
         # get Infrared fluxes
@@ -292,13 +317,13 @@ def getInfoInfrared(InputList):
         # 
         # print
         for i in range(len(iInfrared)):
-            fInfrared_FluxError[i] = fInfrared_FluxError[i].replace('+/-','').replace('...','0.0')
+            fInfrared_FluxError[i] = fInfrared_FluxError[i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-')
             if len(fInfrared_FluxError[i])==0: fInfrared_FluxError[i]=0.0
             if fInfrared_FluxError[i]=='...': fInfrared_FluxError[i]=0.0 #<20180201>#
             fInfrared_FluxError[i] = float(fInfrared_FluxError[i])*1e3 # mJy
             fInfrared_FluxValue[i] = float(fInfrared_FluxValue[i])*1e3 # mJy
             fInfrared_Wavelengthi = 2.99792458e5/(float(fInfrared_Frequency[i])/1e9) # um
-            print fInfrared_Wavelengthi,fInfrared_FluxValue[i],fInfrared_FluxError[i],fInfrared_Passband[i],fInfrared_Reference[i]
+            print(fInfrared_Wavelengthi,fInfrared_FluxValue[i],fInfrared_FluxError[i],fInfrared_Passband[i],fInfrared_Reference[i])
             TemporaryInfrared = numpy.array([(fInfrared_Wavelengthi,fInfrared_FluxValue[i],fInfrared_FluxError[i],fInfrared_Passband[i],fInfrared_Reference[i])], dtype=OutputInfoInfrared.dtype)
             OutputInfoInfrared = rec.stack_arrays( (OutputInfoInfrared, TemporaryInfrared), usemask=False, asrecarray=True, autoconvert=True )
         
@@ -327,9 +352,9 @@ def getInfoIRAS(InputList):
         QueryPhotometry = Ned.get_table(InputItem, table='photometry') # Must be one of [‘photometry’|’positions’|’diameters’|’redshifts’|’references’|’object_notes’]
         
         # 
-        # print InputItem
-        print "----------------------------------------------------------------------------------------------------------------"
-        print InputItem
+        # print(InputItem)
+        print("----------------------------------------------------------------------------------------------------------------")
+        print(InputItem)
         
         # 
         # prepare output array
@@ -350,10 +375,10 @@ def getInfoIRAS(InputList):
         # extract IRAS fluxes
         for i in range(len(QueryPhotometry)):
             if QueryPhotometry['Observed Passband'][i].startswith("IRAS "):
-                print "LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Uncertainty'][i], QueryPhotometry['Units'][i], QueryPhotometry['Refcode'][i]
+                print("LineFlux", QueryPhotometry['Observed Passband'][i], QueryPhotometry['Photometry Measurement'][i], QueryPhotometry['Uncertainty'][i], QueryPhotometry['Units'][i], QueryPhotometry['Refcode'][i])
                 # OutputInfoIRAS.append(QueryPhotometry['Photometry Measurement'][i])
-                # print ""
-                # print str(QueryPhotometry['NED Photometry Measurement'][i])
+                # print("")
+                # print(str(QueryPhotometry['NED Photometry Measurement'][i]))
                 if str(QueryPhotometry['NED Photometry Measurement'][i])=="--":
                     # if the IRAS flux is an upper limit
                     if QueryPhotometry['Observed Passband'][i].startswith("IRAS 12 microns"):
@@ -380,22 +405,22 @@ def getInfoIRAS(InputList):
                     if QueryPhotometry['Observed Passband'][i].startswith("IRAS 12 microns"):
                         if (OutputFluxIRAS12 == 0.0 and OutputFErrIRAS12 == 0.0) or QueryPhotometry['Refcode'][i].startswith("2003AJ....126.1607S"):
                             OutputFluxIRAS12 = float(QueryPhotometry['NED Photometry Measurement'][i])         # mJy
-                            OutputFErrIRAS12 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0'))  # mJy
+                            OutputFErrIRAS12 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-'))  # mJy
                             OutRefcodeIRAS12 = QueryPhotometry['Refcode'][i]
                     if QueryPhotometry['Observed Passband'][i].startswith("IRAS 25 microns"):
                         if (OutputFluxIRAS12 == 0.0 and OutputFErrIRAS12 == 0.0) or QueryPhotometry['Refcode'][i].startswith("2003AJ....126.1607S"):
                             OutputFluxIRAS25 = float(QueryPhotometry['NED Photometry Measurement'][i])         # mJy
-                            OutputFErrIRAS25 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0'))  # mJy
+                            OutputFErrIRAS25 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-'))  # mJy
                             OutRefcodeIRAS25 = QueryPhotometry['Refcode'][i]
                     if QueryPhotometry['Observed Passband'][i].startswith("IRAS 60 microns"):
                         if (OutputFluxIRAS12 == 0.0 and OutputFErrIRAS12 == 0.0) or QueryPhotometry['Refcode'][i].startswith("2003AJ....126.1607S"):
                             OutputFluxIRAS60 = float(QueryPhotometry['NED Photometry Measurement'][i])         # mJy
-                            OutputFErrIRAS60 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0'))  # mJy
+                            OutputFErrIRAS60 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-'))  # mJy
                             OutRefcodeIRAS60 = QueryPhotometry['Refcode'][i]
                     if QueryPhotometry['Observed Passband'][i].startswith("IRAS 100 microns"):
                         if (OutputFluxIRAS12 == 0.0 and OutputFErrIRAS12 == 0.0) or QueryPhotometry['Refcode'][i].startswith("2003AJ....126.1607S"):
                             OutputFluxIRAS100 = float(QueryPhotometry['NED Photometry Measurement'][i])        # mJy
-                            OutputFErrIRAS100 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0')) # mJy
+                            OutputFErrIRAS100 = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-')) # mJy
                             OutRefcodeIRAS100 = QueryPhotometry['Refcode'][i]
         
         # 
@@ -422,31 +447,59 @@ def getInfoPHOT(InputList):
     for InputItem in InputList:
         QueryObject = Ned.query_object(InputItem)
         QueryPhotometry = Ned.get_table(InputItem, table='photometry') # Must be one of [‘photometry’|’positions’|’diameters’|’redshifts’|’references’|’object_notes’]
+        #print(QueryPhotometry.colnames)
+        # 
+        # deal with Python 3 str bytearray problem
+        if sys.version_info.major >= 3:
+            QueryPhotometry['Frequency Mode'] = [t.decode('utf-8').strip() for t in QueryPhotometry['Frequency Mode']]
+            QueryPhotometry['NED Uncertainty'] = [t.decode('utf-8').strip() for t in QueryPhotometry['NED Uncertainty']]
+            QueryPhotometry['Observed Passband'] = [t.decode('utf-8').strip().replace("'","p") for t in QueryPhotometry['Observed Passband']]
+            QueryPhotometry['Refcode'] = [t.decode('utf-8').strip() for t in QueryPhotometry['Refcode']]
+            QueryPhotometry['Qualifiers'] = [t.decode('utf-8').strip().replace('"','arcsec').replace("'","arcmin") for t in QueryPhotometry['Qualifiers']]
+        # 
+        # deal with new NED table column names
+        if 'Flux Density' in QueryPhotometry.colnames and not ('NED Photometry Measurement' in QueryPhotometry.colnames):
+            QueryPhotometry['NED Photometry Measurement'] = QueryPhotometry['Flux Density']
+        
         
         # 
-        # print InputItem
-        print "--------------------------------------------------------"
-        print InputItem
+        # print(InputItem)
+        #print("--------------------------------------------------------")
+        #print(InputItem)
         
         # 
         # extract PHOT fluxes
-        print "#", "%13s"%("Wave"), "%15s"%("Flux"), "%15s"%("FErr"), "%30s"%("Passband"), "%30s"%("Refcode")
-        print "#", "%13s"%("um"), "%15s"%("Jy"), "%15s"%("Jy"), "%30s"%(" "), "%30s"%(" ")
+        print("#", "%13s"%("Wave"), "%15s"%("Flux"), "%15s"%("FErr"), "%30s"%("Passband"), "%30s"%("Refcode"), "   %s"%("Qualifiers"))
+        print("#", "%13s"%("um"), "%15s"%("Jy"), "%15s"%("Jy"), "%30s"%(" "), "%30s"%(" "), "   %s"%(" "))
         for i in range(len(QueryPhotometry)):
+            # 
             if QueryPhotometry['Frequency Mode'][i].startswith("Broad-band "):
+                
+                # remove double quotes
+                if QueryPhotometry['Qualifiers'][i].startswith('"') and QueryPhotometry['Qualifiers'][i].endswith('"'):
+                    QueryPhotometry['Qualifiers'][i] = QueryPhotometry['Qualifiers'][i][1:-1]
+                
+                # remove double quotes
+                if QueryPhotometry['Observed Passband'][i].startswith('"') and QueryPhotometry['Observed Passband'][i].endswith('"'):
+                    QueryPhotometry['Observed Passband'][i] = QueryPhotometry['Observed Passband'][i][1:-1]
+                
+                # replace quote mark
+                QueryPhotometry['Refcode'][i] = QueryPhotometry['Refcode'][i].strip().replace("'","p")
+                if QueryPhotometry['Refcode'][i].startswith('"') and QueryPhotometry['Refcode'][i].endswith('"'):
+                    QueryPhotometry['Refcode'][i] = QueryPhotometry['Refcode'][i][1:-1]
                 
                 # remove uncertainty "+/-" string
                 # remove flux "--" string upper limit
                 if len(QueryPhotometry['NED Uncertainty'][i]) == 0:
                     QueryPhotometry['NED Uncertainty'][i] = "0"
                 elif QueryPhotometry['NED Uncertainty'][i].startswith('+/-'):
-                    QueryPhotometry['NED Uncertainty'][i] = QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0')
+                    QueryPhotometry['NED Uncertainty'][i] = QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-')
                 else:
                     QueryPhotometry['NED Photometry Measurement'][i] = 0.0
                 
                 # 
                 QueryFlux = float(QueryPhotometry['NED Photometry Measurement'][i])
-                QueryFErr = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0'))
+                QueryFErr = float(QueryPhotometry['NED Uncertainty'][i].replace('+/-','').replace('...','0.0').replace('<','-').replace('>','-'))
                 QueryWave = 2.99792458e5/(float(QueryPhotometry['Frequency'][i])/1e9)
                 QueryBand = QueryPhotometry['Observed Passband'][i].replace(' ','')
                 
@@ -454,9 +507,9 @@ def getInfoPHOT(InputList):
                 if QueryPhotometry['NED Photometry Measurement'][i] == 0.0:
                     QueryFErr = QueryFErr/3.0
                 
-                # print results
-                # print "%15g"%(QueryWave), "%15g"%(QueryFlux), "%15g"%(QueryFErr), "%15s"%(QueryPhotometry['Photometry Measurement'][i]), "%-15s"%(QueryPhotometry['Uncertainty'][i]), "%-15s"%(QueryPhotometry['Units'][i]), "%30s"%(QueryPhotometry['Observed Passband'][i])
-                print "%15g"%(QueryWave), "%15g"%(QueryFlux), "%15g"%(QueryFErr), "%30s"%(QueryBand), "%30s"%(QueryPhotometry['Refcode'][i])
+                # print(results)
+                # print("%15g"%(QueryWave), "%15g"%(QueryFlux), "%15g"%(QueryFErr), "%15s"%(QueryPhotometry['Photometry Measurement'][i]), "%-15s"%(QueryPhotometry['Uncertainty'][i]), "%-15s"%(QueryPhotometry['Units'][i]), "%30s"%(QueryPhotometry['Observed Passband'][i]))
+                print("%15g"%(QueryWave), "%15g"%(QueryFlux), "%15g"%(QueryFErr), "%30s"%('"'+QueryBand+'"'), "%30s"%('"'+QueryPhotometry['Refcode'][i]+'"'), "   %s"%('"'+QueryPhotometry['Qualifiers'][i]+'"'))
                 OutputInfoPHOT.append(QueryPhotometry['Photometry Measurement'][i])
         
     # 
@@ -528,62 +581,62 @@ def getInfoPHOT(InputList):
 try:
     import os,sys
 except ImportError: 
-    print "Error! Could not import os,sys!"
+    print("Error! Could not import os,sys!")
 
 try:
     import glob
 except ImportError: 
-    print "Error! Could not import glob!"
+    print("Error! Could not import glob!")
 
 try:
     import re
 except ImportError: 
-    print "Error! Could not import re!"
+    print("Error! Could not import re!")
 
 try:
     import string
 except ImportError: 
-    print "Error! Could not import string!"
+    print("Error! Could not import string!")
 
 try:
     import math
 except ImportError: 
-    print "Error! Could not import math!"
+    print("Error! Could not import math!")
 
 try:
     import numpy
 except ImportError: 
-    print "Error! Could not import numpy!"
+    print("Error! Could not import numpy!")
 
 try:
     import numpy.lib.recfunctions as rec
 except ImportError: 
-    print "Error! Could not import numpy.lib.recfunctions!"
+    print("Error! Could not import numpy.lib.recfunctions!")
 
 try:
     import astropy
 except ImportError: 
-    print "Error! Could not import astropy!"
+    print("Error! Could not import astropy!")
 
 try:
     import astropy.io.ascii as asciitable
 except ImportError: 
-    print "Error! Could not import astropy.io.ascii as asciitable!"
+    print("Error! Could not import astropy.io.ascii as asciitable!")
 
 try:
     import astropy.io.fits as fitsfile
 except ImportError: 
-    print "Error! Could not import astropy.io.fits as fitsfile!"
+    print("Error! Could not import astropy.io.fits as fitsfile!")
 
 try:
     import astroquery
 except ImportError: 
-    print "Error! Could not import astroquery!"
+    print("Error! Could not import astroquery!")
 
 try:
     from astroquery.ned import Ned
 except ImportError: 
-    print "Error! Could not from astroquery.ned import Ned!"
+    print("Error! Could not from astroquery.ned import Ned!")
 
 
 

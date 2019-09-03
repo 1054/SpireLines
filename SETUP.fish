@@ -2,7 +2,7 @@
 # 
 
 
-set BIN_SETUP_SCRIPT (dirname (status --current-filename))/Softwares/bin_setup.bash
+set BIN_SETUP_SCRIPT (dirname (status --current-filename))/Software/bin_setup.bash
 
 #echo 
 #echo "PATH = $PATH"
